@@ -1,48 +1,64 @@
-import { writeFileSync } from "node:fs";
-import { EI_MAG0, EI_MAG1, EI_MAG2, EI_MAG3, EI_CLASS, EI_DATA, EI_VERSION, EI_OSABI, EI_ABIVERSION, EI_PAD } from "./src/types.js";
-import { ElfN_Ehdr } from "./src/ElfN_Ehdr.js";
+import { writeFile, access, readFile } from "node:fs/promises";
+import { createElfHeader } from "./src/createElfHeader.js";
+import { backupFile, getopt, hasOption } from "./src/utility.js";
+
+const OPMODE = {
+    READ: 0,
+    WRITE: 1,
+};
+
+
+
 
 // ==============================
 // JAVASCRIPT SELF-INVOKING FUNCTION
 // ==============================
 
-function main() {
+async function main() {
 
     const args = process.argv;
+
+    const options = getopt(args.length, args, 'h--helpa--about');
+
+    if (hasOption(options, 'h') || hasOption(options, 'help')) {
+        console.log("Usage: node jself.js <name>");
+        process.exit(0);
+    }
+
+    if (hasOption(options, 'a') || hasOption(options, 'about')) {
+        console.log("This is a simple utility to create an ELF header file.");
+        process.exit(0);
+    }
 
     if (args.length < 3) {
         console.log("Usage: node jself.js <name>");
         process.exit(1);
     }
 
-    // Create a new ELF header
-    const ehdr = ElfN_Ehdr();
-    ehdr.e_ident.set(new Uint8Array([EI_MAG0, EI_MAG1, EI_MAG2, EI_MAG3, EI_CLASS.ELFCLASS32, EI_DATA.ELFDATA2LSB, EI_VERSION, EI_OSABI.ELFOSABI_SYSV, EI_ABIVERSION, EI_PAD, EI_PAD, EI_PAD, EI_PAD, EI_PAD, EI_PAD, EI_PAD]));
-    ehdr.e_type.set(new Uint16Array([1]));
-    ehdr.e_machine.set(new Uint16Array([3]));
-    ehdr.e_version.set(new Uint32Array([1]));
-    ehdr.e_entry.set(new Uint32Array([0]));
-    ehdr.e_phoff.set(new Uint32Array([0]));
-    ehdr.e_shoff.set(new Uint32Array([0]));
-    ehdr.e_flags.set(new Uint32Array([0]));
-    ehdr.e_ehsize.set(new Uint16Array([52]));
-    ehdr.e_phentsize.set(new Uint16Array([0]));
-    ehdr.e_phnum.set(new Uint16Array([0]));
-    ehdr.e_shentsize.set(new Uint16Array([0]));
-    ehdr.e_shnum.set(new Uint16Array([0]));
-    ehdr.e_shstrndx.set(new Uint16Array([0]));
+    const startTimestamp = Date.now();
+    console.log(`Start timestamp: ${startTimestamp}`);
 
-    // Print the ELF header as hexadecimal in rows of 16 bytes
-    const buffer = ehdr.get();
-    for (let i = 0; i < buffer.length; i += 16) {
-        const row = buffer.subarray(i, i + 16);
-        console.log(row.reduce((acc, val) => `${acc + val.toString(16).padStart(2, '0')} `, ''));
+    const filename = options.operands[0];
+
+    if (filename === undefined) {
+        console.error("Filename is required");
+        process.exit
     }
 
-    // Save the ELF header to a file
-    writeFileSync(args[2], buffer);
+    // Check if the file already exists
+    await backupFile(filename, startTimestamp);
 
-    console.log(`Wrote ELF header to ${args[2]}`);
+    // Create a new ELF header
+    const buffer = createElfHeader();
+
+    // Save the ELF header to a file
+    await writeFile(filename, buffer);
+
+    console.log(`Wrote ELF header to ${filename}`);
+
+    return 0;
 }
 
-main();
+await main();
+
+
