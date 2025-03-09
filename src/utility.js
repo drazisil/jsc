@@ -100,15 +100,15 @@ export async function backupFile(filename, startTimestamp) {
 }
 
 /**
- * getopt -- command option parsing
+ * getopts -- command option parsing
  * 
  * @description
  * This function parses command-line options and operands.
  * 
- * The `getopt` function uses to following global variables:
+ * The `getopts` function uses to following global variables:
  * - `optind`: The index of the next element in the `argv` array to be processed.
  * 
- * The `getopt` function takes the following arguments:
+ * The `getopts` function takes the following arguments:
  * - `argc`: The number of command-line arguments.
  * - `argv`: An array of command-line arguments.
  * - `optstring`: A string containing the valid option characters.
@@ -118,11 +118,11 @@ export async function backupFile(filename, startTimestamp) {
  * - Characters that represent options with required arguments.
  * - A colon (`:`) to indicate that an option requires an argument.
  * 
- * The `getopt` function returns an object with two properties:
+ * The `getopts` function returns an object with two properties:
  * - `options`: An object containing the parsed options.
  * - `operands`: An array containing the operands.
  * 
- * The `getopt` function follows the POSIX standard for command-line option parsing.
+ * The `getopts` function follows the POSIX standard for command-line option parsing.
  * It has the following rules:
  * - Options are single characters preceded by a hyphen (`-`).
  * - Options may be grouped after a single hyphen.
@@ -140,7 +140,7 @@ export async function backupFile(filename, startTimestamp) {
  * @throws {Error} If an unknown option is encountered.
  * @throws {Error} If an option requires an argument but none is provided.
  */
-export function getopt(argc, argv, optstring) {
+export function getopts(argc, argv, optstring) {
     /** @type {Record<string, string | boolean>} */
     const options = {};
     const operands = [];

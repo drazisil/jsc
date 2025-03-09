@@ -1,6 +1,6 @@
 import { writeFile, access, readFile } from "node:fs/promises";
 import { createElfHeader } from "./src/createElfHeader.js";
-import { backupFile, getopt, hasOption } from "./src/utility.js";
+import { backupFile, getopts, hasOption } from "./src/utility.js";
 
 const OPMODE = {
     READ: 0,
@@ -18,7 +18,7 @@ async function main() {
 
     const args = process.argv;
 
-    const options = getopt(args.length, args, 'h--helpa--about');
+    const options = getopts(args.length, args, 'h--helpa--about');
 
     if (hasOption(options, 'h') || hasOption(options, 'help')) {
         console.log("Usage: node jself.js <name>");
