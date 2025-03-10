@@ -1,11 +1,7 @@
-import { writeFile, access, readFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { createElfHeader } from "./src/createElfHeader.js";
 import { backupFile, getopts, hasOption } from "./src/utility.js";
 
-const OPMODE = {
-    READ: 0,
-    WRITE: 1,
-};
 
 
 
